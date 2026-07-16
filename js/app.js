@@ -259,6 +259,7 @@
                   <span class="ck-n">${esc(d.n)}</span>
                   ${d.w ? `<div class="ck-w">↳ 去哪拿：${esc(d.w)}</div>` : ""}
                   ${d.note ? `<div class="ck-note">${esc(d.note)}</div>` : ""}
+                  ${d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : ""}
                 </span>
               </label></li>`).join("")}
           </ul>
@@ -357,6 +358,7 @@
           <div class="wiz-q" data-q="${i}">
             <div class="wiz-q-t">${esc(d.n)}</div>
             ${d.note ? `<div class="wiz-q-n">${esc(d.note)}</div>` : ""}
+            ${d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : ""}
             <div class="seg">
               <button type="button" data-a="yes">✓ 有了</button>
               <button type="button" data-a="no">還沒</button>
@@ -407,6 +409,7 @@
               <div class="res-t">✕ ${esc(d.n)} ${d.wait ? `<span class="step-wait">◷ ${esc(d.wait)}</span>` : ""}</div>
               <div class="res-w">↳ 去哪拿：${esc(d.w || "見攻略")}</div>
               ${d.note ? `<div class="res-n">${esc(d.note)}</div>` : ""}
+              ${d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : ""}
               ${d.fix && byId[d.fix] ? `<a class="res-fix" href="#/s/${d.fix}">📖 完整解法：${esc(byId[d.fix].title)} →</a>` : ""}
             </div>`).join("")}
         </section>` : ""}

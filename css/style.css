@@ -211,6 +211,13 @@ button { font-family: inherit; cursor: pointer; }
 .ck-note { font-size: 12.5px; color: var(--ink-soft); }
 .progress-line { font-size: 13px; color: var(--stamp-green); font-weight: 700; margin-top: 4px; }
 
+/* 櫃檯會問（回答櫃檯用的標準答案） */
+.ck-spec {
+  margin-top: 6px; padding: 7px 11px;
+  background: rgba(185,138,47,.09); border: 1px dashed var(--gold);
+  border-radius: 9px; font-size: 12.5px; color: #7a5a1c; line-height: 1.55;
+}
+
 /* ── 卡關 Q&A ── */
 .pitfall { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; background: var(--card); }
 .pitfall summary {
