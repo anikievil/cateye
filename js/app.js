@@ -276,6 +276,13 @@
             </details>`).join("")}
         </div>` : ""}
 
+      ${(() => {
+        const rel = CASES.filter((c) => c.goal === id || (c.related || []).includes(id));
+        return rel.length ? `
+          <div class="sec-h rise rise-4"><h2>實戰案例</h2><span class="rule"></span><a class="more" href="#/cases">全部</a></div>
+          <section class="rise rise-4">${rel.map(caseCard).join("")}</section>` : "";
+      })()}
+
       ${s.links && s.links.length ? `
         <div class="sec-h rise rise-4"><h2>官方連結</h2><span class="rule"></span></div>
         <div class="linkrow rise rise-4">
@@ -499,6 +506,64 @@
     });
   }
 
+  // ── 卡關案例（抱怨區） ──
+  const caseCard = (c) => `
+    <details class="case-card">
+      <summary>
+        <span class="case-stamp ${c.status === "solved" ? "st-solved" : "st-open"}">${c.status === "solved" ? "已解決" : "徵解法中"}</span>
+        <span class="case-title">${esc(c.title)}</span>
+        <span class="case-meta">${esc(c.date)}・${esc(c.place)}</span>
+      </summary>
+      <div class="case-body">
+        <div class="case-sec"><b>卡在哪</b><p>${esc(c.stuck)}</p></div>
+        ${c.solution ? `<div class="case-sec"><b>怎麼解</b><p>${esc(c.solution)}</p></div>` : ""}
+        ${c.lesson ? `<div class="case-lesson">📌 ${esc(c.lesson)}</div>` : ""}
+        ${c.goal && byId[c.goal] ? `<a class="res-fix" href="#/s/${c.goal}">📖 這件事的完整攻略 →</a>` : ""}
+      </div>
+    </details>`;
+
+  function renderCases() {
+    const solved = CASES.filter((c) => c.status === "solved");
+    const open = CASES.filter((c) => c.status !== "solved");
+    $app.innerHTML = `
+      <header class="page-head rise">
+        <div class="sec-h" style="margin-top:6px"><h2>✎ 卡關案例</h2><span class="rule"></span></div>
+        <p style="font-size:13.5px;color:var(--ink-soft);margin:0 2px 14px">
+          真實的踩坑經歷。抱怨進來 → 找到解法 → 變成範例，<b>讓後面的人只跑一趟</b>。</p>
+      </header>
+
+      <div class="sec-h rise rise-1"><h2>已解決・後人照抄</h2><span class="rule"></span></div>
+      <section class="rise rise-1">${solved.map(caseCard).join("")}</section>
+
+      ${open.length ? `
+        <div class="sec-h rise rise-2"><h2>徵解法中</h2><span class="rule"></span></div>
+        <section class="rise rise-2">${open.map(caseCard).join("")}</section>` : ""}
+
+      <div class="sec-h rise rise-3"><h2>我要抱怨（回報卡關）</h2><span class="rule"></span></div>
+      <div class="doc-sheet rise rise-3" style="padding-top:16px">
+        <p style="font-size:13px;color:var(--ink-soft);margin-bottom:12px">
+          被踢皮球、白跑一趟、現場才知道缺東西……寫下來。查到解法後會刊在上面（不會登你的個資）。</p>
+        <form class="complain-form" id="cForm">
+          <input type="text" id="cWhat" placeholder="你要辦什麼事？（例：機車過戶）" maxlength="60" required>
+          <input type="text" id="cWhere" placeholder="哪個單位／縣市？（例：台中監理站，選填）" maxlength="60">
+          <textarea id="cStuck" rows="4" placeholder="卡在哪？發生什麼事？（櫃檯說了什麼、缺了什麼、被叫去哪）" required></textarea>
+          <button class="track-btn" type="submit" style="margin-top:4px">✉ 送出抱怨</button>
+        </form>
+        <p style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">會開啟你的信件 App 寄出，內容可先編輯。</p>
+      </div>
+      ${disclaimer()}`;
+
+    document.getElementById("cForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const what = document.getElementById("cWhat").value.trim();
+      const where = document.getElementById("cWhere").value.trim();
+      const stuck = document.getElementById("cStuck").value.trim();
+      const subject = "【跑一次就好】卡關抱怨：" + what;
+      const body = ["◆ 要辦的事：" + what, "◆ 單位／縣市：" + (where || "（未填）"), "", "◆ 卡在哪：", stuck, "", "（此回報將整理成公開案例，不會刊登個人資料）"].join("\n");
+      location.href = "mailto:" + REPORT_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    });
+  }
+
   // ── 據點 ──
   function renderSpots() {
     $app.innerHTML = `
@@ -526,10 +591,11 @@
     const [, page, arg] = h.split("/");
     window.scrollTo(0, 0);
     document.querySelectorAll(".tabbar a").forEach((a) => a.classList.remove("active"));
-    const tab = page === "my" ? "my" : page === "spots" ? "spots" : "home";
+    const tab = page === "my" ? "my" : page === "spots" ? "spots" : page === "cases" ? "cases" : "home";
     document.querySelector(`.tabbar a[data-tab="${tab}"]`).classList.add("active");
 
     if (page === "s" && arg) renderService(arg);
+    else if (page === "cases") return renderCases();
     else if (page === "wizard" && arg) renderWizardCheck(arg);
     else if (page === "wizard") renderWizardPicker();
     else if (page === "cat" && arg) renderCat(arg);

@@ -377,6 +377,47 @@ button { font-family: inherit; cursor: pointer; }
 }
 .disclaimer a { color: var(--ink-soft); }
 
+/* ── 卡關案例 ── */
+.case-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden;
+}
+.case-card summary {
+  list-style: none; cursor: pointer; padding: 13px 15px;
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center;
+}
+.case-card summary::-webkit-details-marker { display: none; }
+.case-card[open] summary { border-bottom: 1px dashed var(--line); background: var(--paper-2); }
+.case-stamp {
+  grid-row: span 2; align-self: start;
+  font-family: var(--serif); font-weight: 900; font-size: 11.5px; letter-spacing: .12em;
+  padding: 4px 7px; border-radius: 7px; transform: rotate(-4deg); white-space: nowrap;
+  border: 1.8px solid;
+}
+.st-solved { color: var(--stamp-green); border-color: var(--stamp-green); background: rgba(46,110,82,.07); }
+.st-open { color: var(--gold); border-color: var(--gold); background: rgba(185,138,47,.08); }
+.case-title { font-weight: 700; font-size: 14.5px; line-height: 1.45; }
+.case-meta { font-size: 11.5px; color: var(--ink-soft); }
+.case-body { padding: 13px 15px 15px; }
+.case-sec { margin-bottom: 10px; }
+.case-sec b {
+  display: inline-block; font-family: var(--serif); font-size: 13px;
+  color: var(--seal-deep); border-bottom: 2px solid var(--seal); margin-bottom: 4px;
+}
+.case-sec p { font-size: 13.5px; color: var(--ink-soft); }
+.case-lesson {
+  background: rgba(46,110,82,.07); border: 1px dashed var(--stamp-green);
+  border-radius: 10px; padding: 10px 13px; font-size: 13px; color: var(--stamp-green);
+  font-weight: 500; margin: 10px 0;
+}
+.complain-form { display: flex; flex-direction: column; gap: 9px; }
+.complain-form input, .complain-form textarea {
+  width: 100%; padding: 11px 13px; font: 500 14px var(--sans); color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px;
+  outline: none; resize: vertical;
+}
+.complain-form input:focus, .complain-form textarea:focus { border-color: var(--seal); }
+
 /* ── 頁尾 / 免責 ── */
 .disclaimer {
   margin: 30px 2px 20px; padding: 14px 16px;
@@ -395,7 +436,7 @@ button { font-family: inherit; cursor: pointer; }
 .tabbar a {
   display: flex; flex-direction: column; align-items: center; gap: 1px;
   font-size: 11.5px; font-weight: 700; text-decoration: none; color: var(--ink-soft);
-  padding: 3px 18px; border-radius: 10px; position: relative;
+  padding: 3px 12px; border-radius: 10px; position: relative;
 }
 .tabbar a.active { color: var(--seal-deep); background: var(--paper-2); }
 .tab-ic { font-size: 17px; line-height: 1.2; }
