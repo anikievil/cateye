@@ -492,6 +492,21 @@ html.big body { zoom: 1.18; }
   font: 700 13px var(--sans); color: var(--seal-deep);
   background: var(--paper); border: 1.5px solid var(--seal); border-radius: 10px;
 }
+.copy-fallback {
+  position: fixed; left: 12px; right: 12px; bottom: 84px; z-index: 98;
+  background: var(--card); border: 1.5px solid var(--seal); border-radius: 14px;
+  padding: 14px; box-shadow: 0 -8px 28px -8px rgba(60,45,20,.35);
+}
+.copy-fallback p { font-size: 13px; font-weight: 700; color: var(--seal-deep); margin-bottom: 8px; }
+.copy-fallback textarea {
+  width: 100%; font: 13px/1.5 var(--sans); color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 9px;
+}
+.copy-fallback button {
+  width: 100%; margin-top: 8px; padding: 9px;
+  font: 700 13.5px var(--sans); background: var(--ink); color: var(--paper);
+  border: none; border-radius: 10px;
+}
 .toast {
   position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
   background: var(--ink); color: var(--paper); font: 700 13.5px var(--sans);

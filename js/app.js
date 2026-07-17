@@ -130,16 +130,41 @@
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2200);
   }
+  // ponytail: execCommand 已棄用但在使用者手勢中同步可靠；async clipboard 在部分環境會懸置
+  function copyText(text, okMsg) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch {}
+    ta.remove();
+    if (ok) return toast(okMsg);
+    if (!navigator.clipboard) return showCopyFallback(text);
+    const timer = setTimeout(() => showCopyFallback(text), 900); // writeText 在部分環境會懸置不回應
+    navigator.clipboard.writeText(text).then(
+      () => { clearTimeout(timer); document.querySelector(".copy-fallback")?.remove(); toast(okMsg); },
+      () => { clearTimeout(timer); showCopyFallback(text); }
+    );
+  }
+  function showCopyFallback(text) {
+    document.querySelector(".copy-fallback")?.remove();
+    const d = document.createElement("div");
+    d.className = "copy-fallback";
+    d.innerHTML = `<p>自動複製被瀏覽器擋住了——長按下面的文字全選複製：</p><textarea readonly rows="5"></textarea><button type="button">關閉</button>`;
+    d.querySelector("textarea").value = text;
+    d.querySelector("button").onclick = () => d.remove();
+    document.body.appendChild(d);
+    const ta = d.querySelector("textarea");
+    ta.focus(); ta.select();
+  }
   async function shareText(text) {
     const full = text + "\n" + location.origin + location.pathname + "#/cases";
-    try {
-      if (navigator.share) { await navigator.share({ text: full }); return; }
-      throw new Error("no-share");
-    } catch (e) {
-      if (e && e.name === "AbortError") return;
-      try { await navigator.clipboard.writeText(full); toast("已複製，貼到群組吧！"); }
-      catch { toast("複製失敗，請長按選取文字"); }
+    if (navigator.share) {
+      try { await navigator.share({ text: full }); return; } catch (e) { if (e.name === "AbortError") return; }
     }
+    copyText(full, "已複製，貼到群組吧！");
   }
   const disclaimer = () => `
     <footer class="disclaimer">⚠ ${esc(DISCLAIMER)}
@@ -620,20 +645,32 @@
           <input type="text" id="cWhat" placeholder="你要辦什麼事？（例：機車過戶）" maxlength="60" required>
           <input type="text" id="cWhere" placeholder="哪個單位／縣市？（例：台中監理站，選填）" maxlength="60">
           <textarea id="cStuck" rows="4" placeholder="卡在哪？發生什麼事？（櫃檯說了什麼、缺了什麼、被叫去哪）" required></textarea>
-          <button class="track-btn" type="submit" style="margin-top:4px">✉ 送出抱怨</button>
+          <button class="track-btn" type="submit" style="margin-top:4px">✉ 用信件送出</button>
+          <button class="share-btn" type="button" id="cCopy" style="margin-top:0">⧉ 複製回報內容（沒有信件 App 用這個）</button>
         </form>
-        <p style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">會開啟你的信件 App 寄出，內容可先編輯。</p>
+        <p style="font-size:11.5px;color:var(--ink-soft);margin-top:8px">信件送出會開啟你的郵件 App；複製後可貼到任何能聯絡到我們的管道。</p>
       </div>
       ${disclaimer()}`;
 
+    const complaintText = () => {
+      const what = document.getElementById("cWhat").value.trim();
+      const stuck = document.getElementById("cStuck").value.trim();
+      if (!what || !stuck) return null;
+      const where = document.getElementById("cWhere").value.trim();
+      return {
+        subject: "【跑一次就好】卡關抱怨：" + what,
+        body: ["◆ 要辦的事：" + what, "◆ 單位／縣市：" + (where || "（未填）"), "", "◆ 卡在哪：", stuck, "", "（此回報將整理成公開案例，不會刊登個人資料）"].join("\n"),
+      };
+    };
     document.getElementById("cForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const what = document.getElementById("cWhat").value.trim();
-      const where = document.getElementById("cWhere").value.trim();
-      const stuck = document.getElementById("cStuck").value.trim();
-      const subject = "【跑一次就好】卡關抱怨：" + what;
-      const body = ["◆ 要辦的事：" + what, "◆ 單位／縣市：" + (where || "（未填）"), "", "◆ 卡在哪：", stuck, "", "（此回報將整理成公開案例，不會刊登個人資料）"].join("\n");
-      location.href = mailtoURL(subject, body);
+      const c = complaintText();
+      if (c) location.href = mailtoURL(c.subject, c.body);
+    });
+    document.getElementById("cCopy").addEventListener("click", () => {
+      const c = complaintText();
+      if (!c) return toast("先填「要辦什麼事」和「卡在哪」");
+      copyText(c.subject + "\n" + c.body + "\n請傳到：" + REPORT_EMAIL, "已複製，貼給我們就行！");
     });
   }
 
