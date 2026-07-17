@@ -222,7 +222,9 @@
           ${tracked ? "✓ 已加入我的清單" : "＋ 加入我的辦事清單"}
         </button>
         ${(s.docs || []).length ? `<a class="wiz-inline" href="#/wizard/${s.id}">⚑ 用嚮導盤點我還缺什麼 →</a>` : ""}
-        <p class="verify-note">△ 待查證：整理於 ${esc(s.lastUpdated)}，出發前請以機關公告為準。
+        <p class="verify-note ${s.verified ? "ok" : ""}">${s.verified
+          ? `✓ 已對照官方公告（${esc(s.verified)}）｜仍以機關最新公告為準。`
+          : `△ 待查證：整理於 ${esc(s.lastUpdated)}，出發前請以機關公告為準。`}
           <a href="${reportMailto(s.title)}" style="color:inherit">✉ 回報有誤</a></p>
       </article>
 

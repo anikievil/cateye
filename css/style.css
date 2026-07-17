@@ -152,6 +152,7 @@ button { font-family: inherit; cursor: pointer; }
 .d-sum { font-size: 14.5px; color: var(--ink-soft); }
 .d-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
 .verify-note { margin-top: 12px; font-size: 11.5px; color: var(--gold); border-top: 1px dashed var(--line); padding-top: 9px; }
+.verify-note.ok { color: var(--stamp-green); }
 
 .kv { display: grid; grid-template-columns: 64px 1fr; gap: 6px 12px; font-size: 14px; margin-top: 14px; }
 .kv dt { color: var(--ink-soft); font-size: 13px; padding-top: 1px; }
