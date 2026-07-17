@@ -492,6 +492,14 @@ html.big body { zoom: 1.18; }
   font: 700 13px var(--sans); color: var(--seal-deep);
   background: var(--paper); border: 1.5px solid var(--seal); border-radius: 10px;
 }
+.share-row { display: flex; gap: 8px; margin-top: 10px; }
+.share-row .share-btn, .share-row .track-btn { margin-top: 0; }
+.share-row > * { flex: 1; }
+.line-btn {
+  display: block; padding: 10px; text-align: center; text-decoration: none;
+  font: 700 13px var(--sans); color: #06c755;
+  background: var(--paper); border: 1.5px solid #06c755; border-radius: 10px;
+}
 .copy-fallback {
   position: fixed; left: 12px; right: 12px; bottom: 84px; z-index: 98;
   background: var(--card); border: 1.5px solid var(--seal); border-radius: 14px;

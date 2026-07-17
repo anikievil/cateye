@@ -159,13 +159,15 @@
     const ta = d.querySelector("textarea");
     ta.focus(); ta.select();
   }
+  const shareFullText = (text) => text + "\n" + location.origin + location.pathname + "#/cases";
   async function shareText(text) {
-    const full = text + "\n" + location.origin + location.pathname + "#/cases";
+    const full = shareFullText(text);
     if (navigator.share) {
       try { await navigator.share({ text: full }); return; } catch (e) { if (e.name === "AbortError") return; }
     }
     copyText(full, "已複製，貼到群組吧！");
   }
+  const lineShareUrl = (text) => "https://line.me/R/share?text=" + encodeURIComponent(shareFullText(text));
   const disclaimer = () => `
     <footer class="disclaimer">⚠ ${esc(DISCLAIMER)}
       <div style="margin-top:8px"><a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a></div>
@@ -605,7 +607,10 @@
         ${c.solution ? `<div class="case-sec"><b>怎麼解</b><p>${esc(c.solution)}</p></div>` : ""}
         ${c.lesson ? `<div class="case-lesson">📌 ${esc(c.lesson)}</div>` : ""}
         ${c.goal && byId[c.goal] ? `<a class="res-fix" href="#/s/${c.goal}">📖 這件事的完整攻略 →</a>` : ""}
-        <button class="share-btn" data-share-case="${c.id}">↗ 分享這個案例</button>
+        <div class="share-row">
+          <button class="share-btn" data-share-case="${c.id}">↗ 分享這個案例</button>
+          <a class="line-btn" href="${lineShareUrl(`【${c.status === "solved" ? "已解決" : "徵解法中"}】${c.title}\n${c.lesson || c.stuck}`)}" target="_blank" rel="noopener">LINE 分享</a>
+        </div>
       </div>
     </details>`;
 
@@ -727,7 +732,10 @@
         <div class="quiz-score">${quiz.score}<small>／${QUIZ.length}</small></div>
         <div class="quiz-title">【${esc(title.t)}】</div>
         <p class="page-desc" style="margin-bottom:6px">${esc(title.d)}</p>
-        <button class="track-btn" id="qShare">↗ 分享我的稱號</button>
+        <div class="share-row">
+          <button class="track-btn" id="qShare" style="margin-top:0">↗ 分享我的稱號</button>
+          <a class="line-btn" href="${lineShareUrl(share)}" target="_blank" rel="noopener">LINE 分享</a>
+        </div>
         <button class="wiz-full" id="qAgain" style="width:100%;border:1.5px solid var(--line);background:var(--card);cursor:pointer">再玩一次</button>
       </article>
       ${wrong.length ? `
@@ -773,7 +781,10 @@
           <button class="bingo-cell ${marks.includes(i) ? "on" : ""} ${i === FREE ? "free" : ""}" data-i="${i}" ${i === FREE ? "disabled" : ""}>${esc(t)}</button>`).join("")}
       </div>
       <section class="rise rise-2" style="margin-top:14px">
-        <button class="track-btn" id="bShare">↗ 分享我的受難等級</button>
+        <div class="share-row">
+          <button class="track-btn" id="bShare" style="margin-top:0">↗ 分享我的受難等級</button>
+          <a class="line-btn" href="${lineShareUrl(`公家機關受難賓果：我中了 ${lines} 條線，獲封【${title.t}】（共踩過 ${marks.length - 1} 種坑）。你中幾條？`)}" target="_blank" rel="noopener">LINE 分享</a>
+        </div>
         <button class="wiz-report" id="bReset" style="width:100%;cursor:pointer">重設賓果卡</button>
       </section>
       ${disclaimer()}`;
