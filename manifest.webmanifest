@@ -1,0 +1,14 @@
+{
+  "name": "跑一次就好 — 公家機關辦事指南",
+  "short_name": "跑一次就好",
+  "description": "流程、文件、費用、卡關處理，一次備齊，不再白跑公家機關。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f1e7",
+  "theme_color": "#f6f1e7",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

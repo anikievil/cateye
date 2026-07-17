@@ -176,6 +176,7 @@
             <div class="brand-name">跑一次就好</div>
             <div class="brand-sub">公家機關辦事指南</div>
           </div>
+          <button class="font-toggle" id="fontBtn">${document.documentElement.classList.contains("big") ? "字－" : "字＋"}</button>
         </div>
         <div class="searchbox">
           <input id="q" type="search" placeholder="要辦什麼？例：權狀不見、過戶、印鑑…" autocomplete="off" enterkeyhint="search">
@@ -219,6 +220,12 @@
         </div>
         ${disclaimer()}
       </section>`;
+
+    document.getElementById("fontBtn").addEventListener("click", (e) => {
+      const on = document.documentElement.classList.toggle("big");
+      store.set("bigfont", on);
+      e.target.textContent = on ? "字－" : "字＋";
+    });
 
     const $q = document.getElementById("q");
     const $r = document.getElementById("results");
@@ -809,6 +816,8 @@
   });
 
   window.addEventListener("hashchange", route);
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (store.get("bigfont", false)) document.documentElement.classList.add("big");
   updateBadge();
   route();
 })();
