@@ -91,6 +91,56 @@
       <div class="svc-s">${esc(s.summary)}</div>
     </a>`;
   const specNote = (d) => (d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : "");
+
+  // ── 吉祥物（嚴肅頁面不出現，見 SOLEMN_IDS） ──
+  function catSVG(pose = "idle", size = 64) {
+    const eyes =
+      pose === "happy" ? '<path d="M26 27q3-4 6 0M44 27q3-4 6 0" class="cl"/>' :
+      pose === "sleep" ? '<path d="M26 28h7M43 28h7" class="cl"/>' :
+      pose === "sad" ? '<path d="M26 29q3 2 6 0M44 29q3 2 6 0" class="cl"/>' :
+      '<circle cx="29" cy="27" r="2.4" class="cf"/><circle cx="47" cy="27" r="2.4" class="cf"/>';
+    const mouth =
+      pose === "sad" ? '<path d="M34 37q4-3 8 0" class="cl"/>' :
+      pose === "happy" ? '<path d="M33 33q2.5 4 5 0q2.5 4 5 0" class="cl"/>' :
+      '<path d="M36 33q2 2 4 0" class="cl"/>';
+    const extra =
+      pose === "sad" ? '<path d="M25 21l7 2M51 21l-7 2" class="cl"/>' :
+      pose === "sleep" ? '<text x="58" y="14" class="zz">z z</text>' : "";
+    return `<svg class="cat cat-${pose}" width="${size}" height="${size}" viewBox="0 0 76 66" aria-hidden="true">
+      <path class="cl cat-tail" d="M62 56q12-2 10-14" fill="none"/>
+      <path class="cp" d="M20 58q-4-18 8-26l24 0q12 8 8 26z"/>
+      <path class="cp" d="M22 14L26 2L36 10M54 14L50 2L40 10"/>
+      <circle class="cp" cx="38" cy="26" r="17"/>
+      ${eyes}<path d="M36 30l2 2 2-2" class="cl"/>${mouth}${extra}
+      <path d="M14 26h9M14 31l9-1M62 26h-9M62 31l-9-1" class="cl"/>
+      <path class="collar" d="M27 44q11 6 22 0l1 4q-12 6-24 0z"/>
+      <circle class="tag" cx="38" cy="50" r="3.4"/>
+    </svg>`;
+  }
+  const catBubble = (pose, text) => `
+    <div class="cat-row">
+      ${catSVG(pose)}
+      <div class="cat-bubble"><b>${esc(MASCOT_NAME)}</b>${esc(text)}</div>
+    </div>`;
+
+  // ── 分享（原生分享面板，備援剪貼簿） ──
+  function toast(msg) {
+    const t = document.createElement("div");
+    t.className = "toast"; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2200);
+  }
+  async function shareText(text) {
+    const full = text + "\n" + location.origin + location.pathname + "#/cases";
+    try {
+      if (navigator.share) { await navigator.share({ text: full }); return; }
+      throw new Error("no-share");
+    } catch (e) {
+      if (e && e.name === "AbortError") return;
+      try { await navigator.clipboard.writeText(full); toast("已複製，貼到群組吧！"); }
+      catch { toast("複製失敗，請長按選取文字"); }
+    }
+  }
   const disclaimer = () => `
     <footer class="disclaimer">⚠ ${esc(DISCLAIMER)}
       <div style="margin-top:8px"><a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a></div>
@@ -132,6 +182,7 @@
           <span class="s-ic">⌕</span>
         </div>
         <div class="search-results" id="results"></div>
+        ${catBubble("idle", MASCOT_TIPS[Math.floor(Math.random() * MASCOT_TIPS.length)])}
         <a class="wiz-cta rise" href="#/wizard">
           <span class="wiz-cta-ic">⚑</span>
           <span><b>不知道缺什麼？先選你要辦的事</b><br>
@@ -408,6 +459,7 @@
         ${missing.length === 0
           ? `<p class="wiz-verdict ok">🎉 ${s.docs.length} 樣全備齊——可以直接出發了！去之前再確認一次開放時間。</p>`
           : `<p class="wiz-verdict">缺 <b>${missing.length}</b> 樣，備齊 ${owned.length} 樣。${slowest ? `<br>⚠ 其中「<b>${esc(slowest.n)}</b>」要等 ${esc(slowest.wait)}——<b>今天就先去辦這個</b>，其他的等的期間再補。` : "缺的都當天可處理，照下面的順序跑就好。"}</p>`}
+        ${SOLEMN_IDS.includes(id) ? "" : catBubble(missing.length === 0 ? "happy" : "sad", missing.length === 0 ? "太強了！出發前再看一眼營業時間喵。" : "先辦最慢的那項，等待期間補其他的喵。")}
       </article>
 
       ${missing.length ? `
@@ -455,8 +507,8 @@
       </header>
 
       ${!list.length ? `
-        <div class="empty-state rise"><div class="big">空</div>
-          還沒有追蹤中的事項。<br>從<a href="#/">首頁</a>找到要辦的事，按「加入我的辦事清單」。
+        <div class="empty-state rise">${catSVG("sleep", 80)}<br>
+          ${esc(MASCOT_NAME)}趴著等你。還沒有追蹤中的事項——<br>從<a href="#/">首頁</a>找到要辦的事，按「加入我的辦事清單」。
         </div>` : `
         <section class="rise rise-1">
           ${list.map((id) => {
@@ -521,6 +573,7 @@
         ${c.solution ? `<div class="case-sec"><b>怎麼解</b><p>${esc(c.solution)}</p></div>` : ""}
         ${c.lesson ? `<div class="case-lesson">📌 ${esc(c.lesson)}</div>` : ""}
         ${c.goal && byId[c.goal] ? `<a class="res-fix" href="#/s/${c.goal}">📖 這件事的完整攻略 →</a>` : ""}
+        <button class="share-btn" data-share-case="${c.id}">↗ 分享這個案例</button>
       </div>
     </details>`;
 
@@ -533,6 +586,17 @@
         <p class="page-desc">
           真實的踩坑經歷。抱怨進來 → 找到解法 → 變成範例，<b>讓後面的人只跑一趟</b>。</p>
       </header>
+
+      <div class="game-cards rise">
+        <a class="game-card" href="#/quiz">
+          <span class="game-ic">⚔</span><b>踩坑測驗</b>
+          <small>${QUIZ.length} 題，測你會不會被公家機關坑</small>
+        </a>
+        <a class="game-card" href="#/bingo">
+          <span class="game-ic">▦</span><b>受難賓果</b>
+          <small>點你中過的坑，看你的受難等級</small>
+        </a>
+      </div>
 
       <div class="sec-h rise rise-1"><h2>已解決・後人照抄</h2><span class="rule"></span></div>
       <section class="rise rise-1">${solved.map(caseCard).join("")}</section>
@@ -566,6 +630,127 @@
     });
   }
 
+  // ── 踩坑測驗 ──
+  let quiz = null;
+  function renderQuiz() {
+    if (!quiz) quiz = { i: 0, score: 0, wrong: [] };
+    if (quiz.i >= QUIZ.length) return renderQuizResult();
+    const item = QUIZ[quiz.i];
+    $app.innerHTML = `
+      <header class="page-head rise">
+        <a class="backlink" href="#/cases">← 卡關案例</a>
+        <div class="sec-h"><h2>踩坑測驗</h2><span class="rule"></span>
+          <span class="quiz-prog">第 ${quiz.i + 1}／${QUIZ.length} 題</span></div>
+      </header>
+      <article class="doc-sheet rise">
+        <p class="quiz-q">${esc(item.q)}</p>
+        <div class="quiz-opts" id="qOpts">
+          ${item.opts.map((o, i) => `<button class="quiz-opt" data-i="${i}">${esc(o)}</button>`).join("")}
+        </div>
+        <div id="qFeedback"></div>
+      </article>`;
+
+    document.getElementById("qOpts").addEventListener("click", (e) => {
+      const btn = e.target.closest(".quiz-opt");
+      if (!btn || document.querySelector(".quiz-opt.hit, .quiz-opt.miss")) return;
+      const pick = +btn.dataset.i;
+      const right = pick === item.ans;
+      if (right) quiz.score++; else quiz.wrong.push(quiz.i);
+      document.querySelectorAll(".quiz-opt").forEach((b, i) => {
+        if (i === item.ans) b.classList.add("hit");
+        else if (i === pick) b.classList.add("miss");
+        b.disabled = true;
+      });
+      document.getElementById("qFeedback").innerHTML = `
+        ${item.solemn ? "" : catBubble(right ? "happy" : "sad", right ? "答對了喵！" : "中招了喵……記起來！")}
+        <p class="quiz-why">${esc(item.why)}</p>
+        ${byId[item.link] ? `<a class="res-fix" href="#/s/${item.link}">📖 完整攻略：${esc(byId[item.link].title)} →</a>` : ""}
+        <button class="track-btn" id="qNext" style="margin-top:14px">${quiz.i + 1 < QUIZ.length ? "下一題 →" : "看我的稱號 →"}</button>`;
+      document.getElementById("qNext").addEventListener("click", () => { quiz.i++; renderQuiz(); });
+    });
+  }
+  function renderQuizResult() {
+    const title = QUIZ_TITLES.find((t) => quiz.score >= t.min);
+    const wrong = quiz.wrong.map((i) => QUIZ[i]);
+    const share = `我在「跑一次就好」踩坑測驗拿了 ${quiz.score}/${QUIZ.length}，獲封【${title.t}】！你敢測嗎？`;
+    $app.innerHTML = `
+      <header class="page-head rise">
+        <a class="backlink" href="#/cases">← 卡關案例</a>
+        <div class="sec-h"><h2>測驗結果</h2><span class="rule"></span></div>
+      </header>
+      <article class="doc-sheet rise" style="text-align:center">
+        ${catSVG(quiz.score >= 6 ? "happy" : quiz.score >= 3 ? "idle" : "sad", 88)}
+        <div class="quiz-score">${quiz.score}<small>／${QUIZ.length}</small></div>
+        <div class="quiz-title">【${esc(title.t)}】</div>
+        <p class="page-desc" style="margin-bottom:6px">${esc(title.d)}</p>
+        <button class="track-btn" id="qShare">↗ 分享我的稱號</button>
+        <button class="wiz-full" id="qAgain" style="width:100%;border:1.5px solid var(--line);background:var(--card);cursor:pointer">再玩一次</button>
+      </article>
+      ${wrong.length ? `
+        <div class="sec-h rise rise-1"><h2>你中招的坑・補課</h2><span class="rule"></span></div>
+        <section class="rise rise-1">
+          ${wrong.map((w) => `
+            <div class="res-card res-miss">
+              <div class="res-t">${esc(w.q)}</div>
+              <div class="res-n">${esc(w.why)}</div>
+              ${byId[w.link] ? `<a class="res-fix" href="#/s/${w.link}">📖 ${esc(byId[w.link].title)} →</a>` : ""}
+            </div>`).join("")}
+        </section>` : ""}
+      ${disclaimer()}`;
+    document.getElementById("qShare").addEventListener("click", () => shareText(share));
+    document.getElementById("qAgain").addEventListener("click", () => { quiz = null; renderQuiz(); });
+  }
+
+  // ── 受難賓果 ──
+  function bingoLines(marks) {
+    const has = (i) => marks.includes(i);
+    let lines = 0;
+    for (let r = 0; r < 5; r++) if ([0, 1, 2, 3, 4].every((c) => has(r * 5 + c))) lines++;
+    for (let c = 0; c < 5; c++) if ([0, 1, 2, 3, 4].every((r) => has(r * 5 + c))) lines++;
+    if ([0, 6, 12, 18, 24].every(has)) lines++;
+    if ([4, 8, 12, 16, 20].every(has)) lines++;
+    return lines;
+  }
+  function renderBingo() {
+    const FREE = 12;
+    let marks = store.get("bingo", [FREE]);
+    if (!marks.includes(FREE)) marks = [...marks, FREE];
+    const lines = bingoLines(marks);
+    const title = BINGO_TITLES.find((t) => lines >= t.min);
+    $app.innerHTML = `
+      <header class="page-head rise">
+        <a class="backlink" href="#/cases">← 卡關案例</a>
+        <div class="sec-h"><h2>公家機關受難賓果</h2><span class="rule"></span></div>
+        <p class="page-desc">點你親身中過的坑。中間是免費格——每個人都值得一次好心承辦。</p>
+      </header>
+      <div class="bingo-status rise">已中 <b>${lines}</b> 條線【${esc(title.t)}】</div>
+      <div class="bingo-grid rise rise-1">
+        ${BINGO_ITEMS.map((t, i) => `
+          <button class="bingo-cell ${marks.includes(i) ? "on" : ""} ${i === FREE ? "free" : ""}" data-i="${i}" ${i === FREE ? "disabled" : ""}>${esc(t)}</button>`).join("")}
+      </div>
+      <section class="rise rise-2" style="margin-top:14px">
+        <button class="track-btn" id="bShare">↗ 分享我的受難等級</button>
+        <button class="wiz-report" id="bReset" style="width:100%;cursor:pointer">重設賓果卡</button>
+      </section>
+      ${disclaimer()}`;
+
+    document.querySelector(".bingo-grid").addEventListener("click", (e) => {
+      const cell = e.target.closest(".bingo-cell");
+      if (!cell || cell.disabled) return;
+      const i = +cell.dataset.i;
+      const at = marks.indexOf(i);
+      if (at >= 0) marks.splice(at, 1); else marks.push(i);
+      store.set("bingo", marks);
+      renderBingo();
+    });
+    document.getElementById("bShare").addEventListener("click", () => {
+      const n = bingoLines(marks);
+      const t = BINGO_TITLES.find((x) => n >= x.min);
+      shareText(`公家機關受難賓果：我中了 ${n} 條線，獲封【${t.t}】（共踩過 ${marks.length - 1} 種坑）。你中幾條？`);
+    });
+    document.getElementById("bReset").addEventListener("click", () => { store.set("bingo", [FREE]); renderBingo(); });
+  }
+
   // ── 據點 ──
   function renderSpots() {
     $app.innerHTML = `
@@ -597,6 +782,8 @@
       document.querySelector('.tabbar a[data-tab="home"]')).classList.add("active");
 
     if (page === "s" && arg) renderService(arg);
+    else if (page === "quiz") return renderQuiz();
+    else if (page === "bingo") return renderBingo();
     else if (page === "cases") return renderCases();
     else if (page === "wizard" && arg) renderWizardCheck(arg);
     else if (page === "wizard") renderWizardPicker();
@@ -606,9 +793,14 @@
     else renderHome();
   }
 
-  // 「我的清單」頁的移除／刪提醒／匯出行事曆（全域委派，只掛一次）
+  // 「我的清單」頁的移除／刪提醒／匯出行事曆／案例分享（全域委派，只掛一次）
   $app.addEventListener("click", (e) => {
     const t = e.target;
+    if (t.dataset.shareCase) {
+      const c = CASES.find((x) => x.id === t.dataset.shareCase);
+      if (c) shareText(`【${c.status === "solved" ? "已解決" : "徵解法中"}】${c.title}\n${c.lesson || c.stuck}`);
+      return;
+    }
     if (t.dataset.rm) { setMyList(myList().filter((x) => x !== t.dataset.rm)); renderMy(); return; }
     if (t.dataset.del !== undefined) {
       const arr = reminders(); arr.splice(+t.dataset.del, 1); setReminders(arr); renderMy(); return;

@@ -417,6 +417,82 @@ button { font-family: inherit; cursor: pointer; }
 }
 .complain-form input:focus, .complain-form textarea:focus { border-color: var(--seal); }
 
+/* ── 吉祥物 ── */
+.cat .cl { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; }
+.cat .cf { fill: var(--ink); }
+.cat .cp { fill: var(--card); stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round; }
+.cat .collar { fill: var(--seal); }
+.cat .tag { fill: var(--gold); stroke: var(--ink); stroke-width: 1.2; }
+.cat .zz { font: 700 11px var(--serif); fill: var(--ink-soft); }
+.cat .cat-tail { transform-origin: 62px 56px; animation: wag 2.4s ease-in-out infinite; }
+@keyframes wag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-14deg); } }
+.cat-row { display: flex; align-items: flex-end; gap: 10px; margin: 14px 0 4px; }
+.cat-row .cat { flex: 0 0 auto; }
+.cat-bubble {
+  position: relative; flex: 1; background: var(--card);
+  border: 1.5px solid var(--line); border-radius: 14px 14px 14px 4px;
+  padding: 9px 13px; font-size: 13px; color: var(--ink-soft);
+  box-shadow: var(--shadow); margin-bottom: 8px;
+}
+.cat-bubble b { display: block; font-family: var(--serif); font-size: 12px; color: var(--seal-deep); }
+@media (prefers-reduced-motion: reduce) { .cat .cat-tail { animation: none; } }
+
+/* ── 踩坑測驗 ── */
+.quiz-prog { font: 700 12.5px var(--sans); color: var(--ink-soft); }
+.quiz-q { font-family: var(--serif); font-weight: 700; font-size: 17px; line-height: 1.5; margin: 6px 0 14px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 9px; }
+.quiz-opt {
+  text-align: left; padding: 13px 15px; font: 500 14.5px var(--sans); color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: 12px;
+}
+.quiz-opt.hit { background: #e9f1ec; border-color: var(--stamp-green); color: var(--stamp-green); font-weight: 700; }
+.quiz-opt.miss { background: #fbeae6; border-color: var(--seal); color: var(--seal-deep); text-decoration: line-through; }
+.quiz-why { font-size: 13.5px; color: var(--ink-soft); margin: 10px 0 12px; }
+.quiz-score { font-family: var(--serif); font-weight: 900; font-size: 44px; color: var(--seal-deep); margin-top: 6px; }
+.quiz-score small { font-size: 20px; color: var(--ink-soft); }
+.quiz-title { font-family: var(--serif); font-weight: 900; font-size: 22px; letter-spacing: .1em; margin: 2px 0 6px; }
+
+/* ── 受難賓果 ── */
+.bingo-status {
+  text-align: center; font-family: var(--serif); font-size: 15px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px; box-shadow: var(--shadow); margin-bottom: 10px;
+}
+.bingo-status b { color: var(--seal-deep); font-size: 19px; }
+.bingo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.bingo-cell {
+  aspect-ratio: 1; padding: 3px; font: 500 10.5px var(--sans); line-height: 1.25;
+  color: var(--ink-soft); background: var(--card); border: 1.5px solid var(--line);
+  border-radius: 9px; overflow: hidden; transition: all .12s;
+}
+.bingo-cell.on {
+  background: var(--seal); border-color: var(--seal-deep); color: #fff;
+  font-weight: 700; transform: rotate(-2deg) scale(.97);
+}
+.bingo-cell.free { background: rgba(185,138,47,.15); border-style: dashed; border-color: var(--gold); color: #7a5a1c; font-weight: 700; }
+
+/* ── 遊戲入口 / 分享 / toast ── */
+.game-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+.game-card {
+  display: flex; flex-direction: column; gap: 2px; text-decoration: none;
+  background: linear-gradient(150deg, #2c3a48, #1e2933); color: #f2ecdf;
+  border-radius: var(--r); padding: 14px 15px; box-shadow: 0 8px 18px -8px rgba(30,40,50,.45);
+}
+.game-card b { font-family: var(--serif); font-size: 15.5px; }
+.game-card small { font-size: 11.5px; color: #b8c0b9; }
+.game-ic { font-size: 18px; color: #d0a355; }
+.share-btn {
+  display: block; width: 100%; margin-top: 10px; padding: 10px;
+  font: 700 13px var(--sans); color: var(--seal-deep);
+  background: var(--paper); border: 1.5px solid var(--seal); border-radius: 10px;
+}
+.toast {
+  position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
+  background: var(--ink); color: var(--paper); font: 700 13.5px var(--sans);
+  padding: 10px 18px; border-radius: 999px; z-index: 99;
+  box-shadow: 0 8px 20px -6px rgba(0,0,0,.4); animation: rise .25s ease both;
+}
+
 /* ── 頁尾 / 免責 ── */
 .disclaimer {
   margin: 30px 2px 20px; padding: 14px 16px;
