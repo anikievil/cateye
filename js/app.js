@@ -15,7 +15,7 @@
     set(k, v) { localStorage.setItem(k, JSON.stringify(v)); },
   };
   const myList = () => store.get("mylist", []);
-  const setMyList = (v) => { store.set("mylist", v); updateBadge(); };
+  const setMyList = (v) => { store.set("mylist", v); updateBadge(v.length); };
   const checks = (id) => store.get("chk:" + id, []);
   const setChecks = (id, v) => store.set("chk:" + id, v);
   const reminders = () => store.get("reminders", []);
@@ -23,9 +23,8 @@
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  function updateBadge() {
+  function updateBadge(n = myList().length) {
     const b = document.getElementById("myBadge");
-    const n = myList().length;
     b.hidden = n === 0;
     b.textContent = n;
   }
@@ -81,9 +80,9 @@
   // ── 共用片段 ──
   const svcChips = (s) => {
     let h = "";
-    if (s.steps && s.steps.length) h += '<span class="chip chip-deep">完整攻略</span>';
+    if (s.steps?.length) h += '<span class="chip chip-deep">完整攻略</span>';
     h += `<span class="chip chip-cat">${esc(catById[s.cat].name)}</span>`;
-    if (s.online && s.online.available) h += '<span class="chip chip-online">可線上辦</span>';
+    if (s.online?.available) h += '<span class="chip chip-online">可線上辦</span>';
     return h;
   };
   const svcItem = (s) => `
@@ -91,14 +90,16 @@
       <div class="svc-t">${esc(s.title)} ${svcChips(s)}</div>
       <div class="svc-s">${esc(s.summary)}</div>
     </a>`;
+  const specNote = (d) => (d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : "");
   const disclaimer = () => `
     <footer class="disclaimer">⚠ ${esc(DISCLAIMER)}
       <div style="margin-top:8px"><a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a></div>
     </footer>`;
 
   // ── 回報系統（mailto，無後端） ──
+  const mailtoURL = (subject, body) =>
+    "mailto:" + REPORT_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
   function reportMailto(topic) {
-    const subject = "【跑一次就好】回報：" + topic;
     const body = [
       "回報項目：" + topic,
       "頁面：" + location.href,
@@ -110,7 +111,7 @@
       "",
       "感謝回報！查證後會更新內容。",
     ].join("\n");
-    return "mailto:" + REPORT_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    return mailtoURL("【跑一次就好】回報：" + topic, body);
   }
 
   // ── 首頁 ──
@@ -189,8 +190,8 @@
     $app.innerHTML = `
       <header class="page-head rise">
         <a class="backlink" href="#/">← 回首頁</a>
-        <div class="sec-h" style="margin-top:0"><h2>${esc(c.icon)}　${esc(c.name)}</h2><span class="rule"></span></div>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0 2px 14px">${esc(c.desc)}</p>
+        <div class="sec-h"><h2>${esc(c.icon)}　${esc(c.name)}</h2><span class="rule"></span></div>
+        <p class="page-desc">${esc(c.desc)}</p>
       </header>
       <section class="rise rise-1">${list.map(svcItem).join("")}</section>
       ${disclaimer()}`;
@@ -228,13 +229,13 @@
           <a href="${reportMailto(s.title)}" style="color:inherit">✉ 回報有誤</a></p>
       </article>
 
-      ${s.online && s.online.available ? `
+      ${s.online?.available ? `
         <div class="online-band rise rise-1">◎ 這件事可以線上辦！
           ${s.online.url ? `<a href="${esc(s.online.url)}" target="_blank" rel="noopener">前往線上申辦 ↗</a>` : ""}
           ${s.online.note ? `<span style="color:var(--ink-soft)">（${esc(s.online.note)}）</span>` : ""}
         </div>` : ""}
 
-      ${s.steps && s.steps.length ? `
+      ${s.steps?.length ? `
         <div class="sec-h rise rise-1"><h2>流程</h2><span class="rule"></span></div>
         <ol class="timeline rise rise-1">
           ${s.steps.map((st, i) => `
@@ -251,7 +252,7 @@
 
       ${docsN ? `
         <div class="sec-h rise rise-2"><h2>文件清單</h2><span class="rule"></span></div>
-        <div class="doc-sheet rise rise-2" style="padding-top:14px">
+        <div class="doc-sheet tight rise rise-2">
           <ul class="checklist" id="ckList">
             ${s.docs.map((d, i) => `
               <li><label>
@@ -261,14 +262,14 @@
                   <span class="ck-n">${esc(d.n)}</span>
                   ${d.w ? `<div class="ck-w">↳ 去哪拿：${esc(d.w)}</div>` : ""}
                   ${d.note ? `<div class="ck-note">${esc(d.note)}</div>` : ""}
-                  ${d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : ""}
+                  ${specNote(d)}
                 </span>
               </label></li>`).join("")}
           </ul>
           <div class="progress-line" id="ckProg"></div>
         </div>` : ""}
 
-      ${s.pitfalls && s.pitfalls.length ? `
+      ${s.pitfalls?.length ? `
         <div class="sec-h rise rise-3"><h2>卡關了怎麼辦</h2><span class="rule"></span></div>
         <div class="rise rise-3">
           ${s.pitfalls.map((p) => `
@@ -285,7 +286,7 @@
           <section class="rise rise-4">${rel.map(caseCard).join("")}</section>` : "";
       })()}
 
-      ${s.links && s.links.length ? `
+      ${s.links?.length ? `
         <div class="sec-h rise rise-4"><h2>官方連結</h2><span class="rule"></span></div>
         <div class="linkrow rise rise-4">
           ${s.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}
@@ -306,8 +307,7 @@
     // checklist
     const $ck = document.getElementById("ckList");
     const $prog = document.getElementById("ckProg");
-    function refreshProg() {
-      const n = checks(id).length;
+    function refreshProg(n) {
       if ($prog) $prog.textContent = n === 0 ? "" : n === docsN ? "🎉 文件備齊，可以出發了" : `已備妥 ${n} / ${docsN} 份`;
     }
     if ($ck) {
@@ -318,9 +318,9 @@
         if (e.target.checked && at < 0) arr.push(i);
         if (!e.target.checked && at >= 0) arr.splice(at, 1);
         setChecks(id, arr);
-        refreshProg();
+        refreshProg(arr.length);
       });
-      refreshProg();
+      refreshProg(done.length);
     }
   }
 
@@ -333,8 +333,8 @@
     $app.innerHTML = `
       <header class="page-head rise">
         <a class="backlink" href="#/">← 回首頁</a>
-        <div class="sec-h" style="margin-top:0"><h2>⚑ 你這趟最主要要完成什麼？</h2><span class="rule"></span></div>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0 2px 14px">選一件事，下一步幫你盤點文件、列出缺件的解法。</p>
+        <div class="sec-h"><h2>⚑ 你這趟最主要要完成什麼？</h2><span class="rule"></span></div>
+        <p class="page-desc">選一件事，下一步幫你盤點文件、列出缺件的解法。</p>
       </header>
       <section class="rise rise-1">
         <div class="wiz-group-t">最多人卡關的</div>
@@ -358,16 +358,16 @@
     $app.innerHTML = `
       <header class="page-head rise">
         <a class="backlink" href="#/wizard">← 重選目的</a>
-        <div class="sec-h" style="margin-top:0"><h2>盤點一下</h2><span class="rule"></span></div>
+        <div class="sec-h"><h2>盤點一下</h2><span class="rule"></span></div>
         <p style="font-size:14px;margin:0 2px 4px"><b>${esc(s.title)}</b> 需要 ${s.docs.length} 樣東西——你手上有了嗎？</p>
-        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 2px 14px">不確定就按「還沒」，方案裡會告訴你去哪拿。</p>
+        <p class="page-desc">不確定就按「還沒」，方案裡會告訴你去哪拿。</p>
       </header>
       <section class="rise rise-1">
         ${s.docs.map((d, i) => `
           <div class="wiz-q" data-q="${i}">
             <div class="wiz-q-t">${esc(d.n)}</div>
             ${d.note ? `<div class="wiz-q-n">${esc(d.note)}</div>` : ""}
-            ${d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : ""}
+            ${specNote(d)}
             <div class="seg">
               <button type="button" data-a="yes">✓ 有了</button>
               <button type="button" data-a="no">還沒</button>
@@ -395,12 +395,12 @@
     const s = byId[id];
     const missing = s.docs.map((d, i) => ({ ...d, i })).filter((d) => !wizAnswers[d.i]);
     const owned = s.docs.map((d, i) => ({ ...d, i })).filter((d) => wizAnswers[d.i]);
-    const slowest = missing.filter((d) => d.wait && /週|月/.test(d.wait)).sort((a, b) => (b.wait.includes("月") ? 1 : 0) - (a.wait.includes("月") ? 1 : 0))[0];
+    const slowest = missing.find((d) => d.wait?.includes("月")) || missing.find((d) => d.wait?.includes("週"));
 
     $app.innerHTML = `
       <header class="page-head rise">
         <a class="backlink" href="#/wizard/${id}">← 重新盤點</a>
-        <div class="sec-h" style="margin-top:0"><h2>你的準備方案</h2><span class="rule"></span></div>
+        <div class="sec-h"><h2>你的準備方案</h2><span class="rule"></span></div>
       </header>
 
       <article class="doc-sheet rise">
@@ -418,7 +418,7 @@
               <div class="res-t">✕ ${esc(d.n)} ${d.wait ? `<span class="step-wait">◷ ${esc(d.wait)}</span>` : ""}</div>
               <div class="res-w">↳ 去哪拿：${esc(d.w || "見攻略")}</div>
               ${d.note ? `<div class="res-n">${esc(d.note)}</div>` : ""}
-              ${d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : ""}
+              ${specNote(d)}
               ${d.fix && byId[d.fix] ? `<a class="res-fix" href="#/s/${d.fix}">📖 完整解法：${esc(byId[d.fix].title)} →</a>` : ""}
             </div>`).join("")}
         </section>` : ""}
@@ -451,7 +451,7 @@
 
     $app.innerHTML = `
       <header class="page-head rise">
-        <div class="sec-h" style="margin-top:6px"><h2>我的辦事清單</h2><span class="rule"></span></div>
+        <div class="sec-h"><h2>我的辦事清單</h2><span class="rule"></span></div>
       </header>
 
       ${!list.length ? `
@@ -476,7 +476,7 @@
         </section>`}
 
       <div class="sec-h rise rise-2"><h2>到期提醒</h2><span class="rule"></span></div>
-      <div class="doc-sheet rise rise-2" style="padding-top:16px">
+      <div class="doc-sheet tight rise rise-2">
         ${rems.length ? rems.map((r) => `
           <div class="remind-item">
             <span>${esc(r.label)}</span>
@@ -529,8 +529,8 @@
     const open = CASES.filter((c) => c.status !== "solved");
     $app.innerHTML = `
       <header class="page-head rise">
-        <div class="sec-h" style="margin-top:6px"><h2>✎ 卡關案例</h2><span class="rule"></span></div>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0 2px 14px">
+        <div class="sec-h"><h2>✎ 卡關案例</h2><span class="rule"></span></div>
+        <p class="page-desc">
           真實的踩坑經歷。抱怨進來 → 找到解法 → 變成範例，<b>讓後面的人只跑一趟</b>。</p>
       </header>
 
@@ -542,7 +542,7 @@
         <section class="rise rise-2">${open.map(caseCard).join("")}</section>` : ""}
 
       <div class="sec-h rise rise-3"><h2>我要抱怨（回報卡關）</h2><span class="rule"></span></div>
-      <div class="doc-sheet rise rise-3" style="padding-top:16px">
+      <div class="doc-sheet tight rise rise-3">
         <p style="font-size:13px;color:var(--ink-soft);margin-bottom:12px">
           被踢皮球、白跑一趟、現場才知道缺東西……寫下來。查到解法後會刊在上面（不會登你的個資）。</p>
         <form class="complain-form" id="cForm">
@@ -562,7 +562,7 @@
       const stuck = document.getElementById("cStuck").value.trim();
       const subject = "【跑一次就好】卡關抱怨：" + what;
       const body = ["◆ 要辦的事：" + what, "◆ 單位／縣市：" + (where || "（未填）"), "", "◆ 卡在哪：", stuck, "", "（此回報將整理成公開案例，不會刊登個人資料）"].join("\n");
-      location.href = "mailto:" + REPORT_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      location.href = mailtoURL(subject, body);
     });
   }
 
@@ -570,8 +570,8 @@
   function renderSpots() {
     $app.innerHTML = `
       <header class="page-head rise">
-        <div class="sec-h" style="margin-top:6px"><h2>找辦理據點</h2><span class="rule"></span></div>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0 2px 14px">「地圖找最近的」會用你的位置搜尋；出發前記得先查開放時間，很多單位中午休息、週末不開。</p>
+        <div class="sec-h"><h2>找辦理據點</h2><span class="rule"></span></div>
+        <p class="page-desc">「地圖找最近的」會用你的位置搜尋；出發前記得先查開放時間，很多單位中午休息、週末不開。</p>
       </header>
       <section class="rise rise-1">
         ${SPOTS.map((sp) => `
@@ -593,8 +593,8 @@
     const [, page, arg] = h.split("/");
     window.scrollTo(0, 0);
     document.querySelectorAll(".tabbar a").forEach((a) => a.classList.remove("active"));
-    const tab = page === "my" ? "my" : page === "spots" ? "spots" : page === "cases" ? "cases" : "home";
-    document.querySelector(`.tabbar a[data-tab="${tab}"]`).classList.add("active");
+    (document.querySelector(`.tabbar a[data-tab="${page}"]`) ||
+      document.querySelector('.tabbar a[data-tab="home"]')).classList.add("active");
 
     if (page === "s" && arg) renderService(arg);
     else if (page === "cases") return renderCases();

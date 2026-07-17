@@ -77,6 +77,8 @@ button { font-family: inherit; cursor: pointer; }
 .sec-h h2 { font-size: 19px; font-weight: 700; letter-spacing: .05em; }
 .sec-h .rule { flex: 1; border-top: 1px dashed var(--line); transform: translateY(-4px); }
 .sec-h .more { font: 500 13px var(--sans); color: var(--ink-soft); text-decoration: none; }
+.page-head .sec-h { margin-top: 4px; }
+.page-desc { font-size: 13.5px; color: var(--ink-soft); margin: 0 2px 14px; }
 
 /* ── 情境包（featured） ── */
 .feat-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px; scroll-snap-type: x mandatory; }
@@ -143,6 +145,7 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
   box-shadow: var(--shadow); padding: 22px 20px; margin-bottom: 14px; position: relative;
 }
+.doc-sheet.tight { padding-top: 16px; }
 .doc-sheet::before { /* 紅頭公文線 */
   content: ""; position: absolute; top: 0; left: 20px; right: 20px; height: 3px;
   background: linear-gradient(90deg, var(--seal), rgba(187,58,42,.15));
@@ -247,7 +250,7 @@ button { font-family: inherit; cursor: pointer; }
 .online-band a { color: var(--stamp-green); font-weight: 700; }
 
 /* ── 我的清單 ── */
-.my-item {
+.my-item, .spot-item {
   background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
   box-shadow: var(--shadow); padding: 14px 16px; margin-bottom: 10px;
 }
@@ -273,7 +276,6 @@ button { font-family: inherit; cursor: pointer; }
   padding: 10px 16px; font: 700 13.5px var(--sans);
   background: var(--ink); color: var(--paper); border: none; border-radius: 10px;
 }
-.btn-ghost { background: var(--card); color: var(--ink); border: 1.5px solid var(--line); }
 .remind-item {
   display: flex; justify-content: space-between; align-items: center; gap: 10px;
   padding: 11px 4px; border-bottom: 1px dashed var(--line); font-size: 14px;
@@ -289,10 +291,6 @@ button { font-family: inherit; cursor: pointer; }
 .due-banner b { display: block; margin-bottom: 2px; }
 
 /* ── 據點 ── */
-.spot-item {
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
-  box-shadow: var(--shadow); padding: 14px 16px; margin-bottom: 10px;
-}
 .spot-name { font-weight: 700; font-size: 15.5px; }
 .spot-note { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
 .spot-links { display: flex; gap: 8px; margin-top: 10px; }
