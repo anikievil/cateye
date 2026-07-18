@@ -564,3 +564,12 @@ html.big body { zoom: 1.18; }
 @media (min-width: 560px) {
   .feat-card { flex-basis: 300px; }
 }
+
+/* ── 列印／下載完整包 ── */
+@media print {
+  .no-print, .tabbar { display: none !important; }
+  body { background: #fff; padding-bottom: 0; }
+  .doc-sheet, .doc-sheet.tight, .case-card { box-shadow: none; border: 1px solid #ccc; }
+  .case-card { break-inside: avoid; }
+  a[href]:after { content: none !important; }
+}

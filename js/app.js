@@ -170,7 +170,7 @@
   const lineShareUrl = (text) => "https://line.me/R/share?text=" + encodeURIComponent(shareFullText(text));
   const disclaimer = () => `
     <footer class="disclaimer">⚠ ${esc(DISCLAIMER)}
-      <div style="margin-top:8px"><a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a></div>
+      <div class="no-print" style="margin-top:8px"><a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a></div>
     </footer>`;
 
   // ── 回報系統（mailto，無後端） ──
@@ -307,11 +307,12 @@
         <button class="track-btn ${tracked ? "on" : ""}" id="trackBtn">
           ${tracked ? "✓ 已加入我的清單" : "＋ 加入我的辦事清單"}
         </button>
-        ${(s.docs || []).length ? `<a class="wiz-inline" href="#/wizard/${s.id}">⚑ 用嚮導盤點我還缺什麼 →</a>` : ""}
+        <button class="share-btn no-print" id="printBtn">⬇ 下載這頁完整包（PDF）</button>
+        ${(s.docs || []).length ? `<a class="wiz-inline no-print" href="#/wizard/${s.id}">⚑ 用嚮導盤點我還缺什麼 →</a>` : ""}
         <p class="verify-note ${s.verified ? "ok" : ""}">${s.verified
           ? `✓ 已對照官方公告（${esc(s.verified)}）｜仍以機關最新公告為準。`
           : `△ 待查證：整理於 ${esc(s.lastUpdated)}，出發前請以機關公告為準。`}
-          <a href="${reportMailto(s.title)}" style="color:inherit">✉ 回報有誤</a></p>
+          <a class="no-print" href="${reportMailto(s.title)}" style="color:inherit">✉ 回報有誤</a></p>
       </article>
 
       ${s.online?.available ? `
@@ -388,6 +389,7 @@
       e.target.className = "track-btn " + (i < 0 ? "on" : "");
       e.target.textContent = i < 0 ? "✓ 已加入我的清單" : "＋ 加入我的辦事清單";
     });
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
 
     // checklist
     const $ck = document.getElementById("ckList");
@@ -607,7 +609,7 @@
         ${c.solution ? `<div class="case-sec"><b>怎麼解</b><p>${esc(c.solution)}</p></div>` : ""}
         ${c.lesson ? `<div class="case-lesson">📌 ${esc(c.lesson)}</div>` : ""}
         ${c.goal && byId[c.goal] ? `<a class="res-fix" href="#/s/${c.goal}">📖 這件事的完整攻略 →</a>` : ""}
-        <div class="share-row">
+        <div class="share-row no-print">
           <button class="share-btn" data-share-case="${c.id}">↗ 分享這個案例</button>
           <a class="line-btn" href="${lineShareUrl(`【${c.status === "solved" ? "已解決" : "徵解法中"}】${c.title}\n${c.lesson || c.stuck}`)}" target="_blank" rel="noopener">LINE 分享</a>
         </div>
