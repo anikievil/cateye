@@ -182,7 +182,10 @@
   const lineShareUrl = (text) => "https://line.me/R/share?text=" + encodeURIComponent(shareFullText(text));
   const disclaimer = () => `
     <footer class="disclaimer">⚠ ${esc(DISCLAIMER)}
-      <div class="no-print" style="margin-top:8px"><a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a></div>
+      <div class="no-print" style="margin-top:8px">
+        <a href="${reportMailto("整體建議或錯誤回報")}">✉ 回報錯誤／給我們建議</a>
+        ・<a href="#/about">這個網站是怎麼做的</a>
+      </div>
     </footer>`;
 
   // ── 回報系統（mailto，無後端） ──
@@ -894,6 +897,104 @@
       ${disclaimer()}`;
   }
 
+  // ── 關於這個網站（數據取自現有資料，不寫死，內容跟著長） ──
+  const ABOUT_LOG = [
+    { day: "7 月 16 日", items: [
+      ["22:15", "v1 上線：骨架、分類、基本查詢"],
+      ["22:52", "新增「櫃檯會問」——破解單位互踢皮球的份數／用途標準答案"],
+    ] },
+    { day: "7 月 17 日", items: [
+      ["08:03", "卡關案例（抱怨區）上線：抱怨 → 查證 → 變後人範例"],
+      ["08:27", "第一輪官方查證：21/38 項對照公告，修正 7 處錯誤"],
+      ["13:30", "分享機制（測驗＋賓果）與吉祥物上線"],
+      ["13:41", "PWA 離線支援＋長輩大字模式"],
+      ["18:44", "第二輪查證完成：37/38 對照官方，修正 ARC 新制與死連結"],
+    ] },
+    { day: "7 月 18 日", items: [
+      ["03:43", "38/38 業務內容全補完（流程＋卡關 Q&A）"],
+      ["07:59", "LINE 分享、下載列印完整包、開發全記錄教學文上線"],
+      ["08:45", "第三輪查證：52 條待查證敘述清到剩 9 條"],
+      ["09:18", "深色模式、robots.txt／sitemap.xml、新情境包「離職／換工作」"],
+      ["09:26", "Lighthouse 健檢：效能 55→98、無障礙 93→100"],
+      ["09:56", "退休情境包、深淺色手動切換、雙貓吉祥物「白白」與「咕嚕」"],
+    ] },
+  ];
+  const ABOUT_NOTES = [
+    { q: "查證・護照工作天數", a: "網路流傳護照一般件 4 個工作天，官網查證後其實是 10 個工作天——查證結果本身變成一則破謠言案例，收在「卡關案例」裡。" },
+    { q: "查證・房屋稅退稅年限", a: "原內容沿用 2021 年修法前的舊制「5 年」，現行是 10／15 年。法條會過期，不能靠記憶填答案。" },
+    { q: "工程・死連結", a: "遺失物系統網址用 curl 實測，DNS 直接解析失敗，官方連結早就換了。任何寫進內容的網址都要實測連通，不能只看「像官網」。" },
+    { q: "工程・被自己的快取咬到", a: "PWA 上線後，改了內容卻在真機上看到舊版——是自己的 service worker 快取沒同步升版，寫腳本一鍵同步版本號解決。" },
+    { q: "工程・剪貼簿懸置", a: "分享按鈕的 clipboard API 在部分環境會靜靜懸置、沒有任何錯誤訊號，改成三層備援：同步複製 → 非同步 API → 逾時後彈手動全選面板。" },
+    { q: "工程・正則吞掉下一段", a: "批次補內容時用正則定位「分類最後一筆」再插入，若目標剛好是區塊邊界，正則會多吞一段，插入位置就錯了。改用錨點式插入才穩。" },
+  ];
+  function renderAbout() {
+    const verified = SERVICES.filter((s) => s.verified).length;
+    const scenarioN = SERVICES.filter((s) => s.cat === "scenario").length;
+    const steps = SERVICES.reduce((a, s) => a + (s.steps || []).length, 0);
+    const docsN = SERVICES.reduce((a, s) => a + (s.docs || []).length, 0);
+    const pitfallsN = SERVICES.reduce((a, s) => a + (s.pitfalls || []).length, 0);
+    const solved = CASES.filter((c) => c.status === "solved").length;
+    const stats = [
+      [SERVICES.length, "業務攻略"],
+      [`${Math.round((verified / SERVICES.length) * 100)}%`, "已查證"],
+      [scenarioN, "情境包"],
+      [steps, "流程步驟"],
+      [docsN, "文件清單項目"],
+      [pitfallsN, "卡關 Q&A"],
+      [QUIZ.length, "題踩坑測驗"],
+      [BINGO_ITEMS.length, "格受難賓果"],
+      [`${solved}／${CASES.length}`, "案例已解決"],
+    ];
+    $app.innerHTML = `
+      <header class="page-head rise">
+        <a class="backlink" href="#/">← 回首頁</a>
+        <div class="sec-h"><h2>◇ 這個網站是怎麼做的</h2><span class="rule"></span></div>
+      </header>
+
+      <article class="doc-sheet rise">
+        <p class="d-sum">向農會辦房屋土地抵押貸款，財力證明印了、聯徵費繳了、核貸也下來了——送件後才被通知要補「土地使用分區證明」；補齊送件、對保當天，才發現所有權狀正本找不到，補發要公告 30 天，貸款整案延後一個多月。補發權狀還要先辦印鑑證明，戶政櫃檯問「幾份？用途？」，答不出來又被推回地政，兩個單位跑了三趟。這些坑每一個都有人踩過，但沒人把答案留下來——於是有了這個網站：把踩過的坑、櫃檯會問的話、文件去哪拿，全部做成免費的辦事指南。</p>
+      </article>
+
+      <div class="sec-h rise rise-1"><h2>累積了什麼</h2><span class="rule"></span></div>
+      <div class="stat-grid rise rise-1">
+        ${stats.map(([n, l]) => `<div class="stat-item"><b>${esc(String(n))}</b><span>${esc(l)}</span></div>`).join("")}
+      </div>
+
+      <div class="sec-h rise rise-2"><h2>怎麼做的</h2><span class="rule"></span></div>
+      <div class="doc-sheet tight rise rise-2">
+        <dl class="spec-kv">
+          <dt>架構</dt><dd>純前端 SPA，hash routing</dd>
+          <dt>後端</dt><dd>無——零資料庫、零登入、零伺服器邏輯</dd>
+          <dt>資料儲存</dt><dd>localStorage（清單、提醒、賓果進度）</dd>
+          <dt>離線支援</dt><dd>PWA，service worker 網路優先快取</dd>
+          <dt>部署</dt><dd>GitHub Pages（靜態代管）</dd>
+          <dt>Lighthouse</dt><dd>效能 98・無障礙 100・最佳實踐 100・SEO 100</dd>
+          <dt>內容查證</dt><dd>三輪查證，子代理分工對照官方公告</dd>
+        </dl>
+      </div>
+
+      <div class="sec-h rise rise-3"><h2>工程筆記</h2><span class="rule"></span></div>
+      <div class="rise rise-3">
+        ${ABOUT_NOTES.map((n) => `
+          <details class="pitfall">
+            <summary><span class="pit-mark">問</span>${esc(n.q)}</summary>
+            <div class="pit-a">${esc(n.a)}</div>
+          </details>`).join("")}
+      </div>
+
+      <div class="sec-h rise rise-4"><h2>開發時間軸</h2><span class="rule"></span></div>
+      <div class="doc-sheet tight about-log rise rise-4">
+        ${ABOUT_LOG.map((d) => `
+          <div class="day">${esc(d.day)}</div>
+          ${d.items.map(([t, txt]) => `<div class="entry"><time>${esc(t)}</time><p>${esc(txt)}</p></div>`).join("")}
+        `).join("")}
+      </div>
+
+      <p class="page-desc rise rise-4" style="margin-top:14px">想看更完整的開發過程與判斷理由，可以讀<a href="docs/TUTORIAL.md" target="_blank" rel="noopener">開發全記錄</a>。</p>
+
+      ${disclaimer()}`;
+  }
+
   // ── Router ──
   function route() {
     const h = location.hash || "#/";
@@ -913,6 +1014,7 @@
     else if (page === "my") renderMy();
     else if (page === "spots") renderSpots();
     else if (page === "guide") renderGuide();
+    else if (page === "about") renderAbout();
     else renderHome();
   }
 
