@@ -264,6 +264,7 @@
               <span><span class="cat-name">${esc(c.name)}</span><br><span class="cat-desc">${esc(c.desc)}</span></span>
             </a>`).join("")}
         </div>
+        <a class="wiz-report rise rise-2" href="#/about" style="display:block">◇ 這個網站是怎麼做的——緣起故事與累積數據 →</a>
         ${disclaimer()}
       </section>`;
 
