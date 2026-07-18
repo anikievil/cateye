@@ -1,5 +1,5 @@
 // 跑一次就好 — Service Worker（網路優先，離線退回快取）
-const CACHE = "run-once-v20";
+const CACHE = "run-once-v21";
 
 self.addEventListener("install", () => self.skipWaiting());
 
