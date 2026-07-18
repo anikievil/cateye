@@ -580,7 +580,7 @@ html.big body { zoom: 1.18; }
     --card: #2b241d;
     --ink: #ece4d6;
     --ink-soft: #b6a992;
-    --seal: #e2543f;
+    --seal: #c8402d;
     --seal-deep: #ff8b73;
     --stamp-green: #5fbf93;
     --gold: #d9a53f;
@@ -588,12 +588,14 @@ html.big body { zoom: 1.18; }
     --shadow: 0 1px 2px rgba(0,0,0,.35), 0 6px 18px -8px rgba(0,0,0,.55);
   }
   .tabbar { background: rgba(43,36,29,.92); }
-  .due-banner { background: rgba(226,84,63,.14); border-color: rgba(226,84,63,.4); }
+  .due-banner { background: rgba(200,64,45,.16); border-color: rgba(200,64,45,.45); }
   .quiz-opt.hit { background: rgba(95,191,147,.14); }
-  .quiz-opt.miss { background: rgba(226,84,63,.14); }
+  .quiz-opt.miss { background: rgba(200,64,45,.16); }
   .bingo-cell.free { color: var(--gold); }
   .step-wait { background: rgba(217,165,63,.14); border-color: rgba(217,165,63,.4); color: var(--gold); }
   .ck-spec { color: var(--gold); }
+  /* --seal 亮度為了按鈕白字對比降低，這幾處是拿 --seal 當純文字用，改用較亮的 --seal-deep 維持可讀性 */
+  .searchbox .s-ic, .pit-mark, .linkrow a::after, .remind-date.soon, .wiz-goal span { color: var(--seal-deep); }
 }
 
 /* ── 列印／下載完整包 ── */
