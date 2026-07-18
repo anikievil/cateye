@@ -203,7 +203,10 @@
             <div class="brand-name">跑一次就好</div>
             <div class="brand-sub">公家機關辦事指南</div>
           </div>
-          <button class="font-toggle" id="fontBtn">${document.documentElement.classList.contains("big") ? "字－" : "字＋"}</button>
+          <div class="brand-actions">
+            <a class="guide-link" href="#/guide">？怎麼用</a>
+            <button class="font-toggle" id="fontBtn">${document.documentElement.classList.contains("big") ? "字－" : "字＋"}</button>
+          </div>
         </div>
         <div class="searchbox">
           <input id="q" type="search" placeholder="要辦什麼？例：權狀不見、過戶、印鑑…" autocomplete="off" enterkeyhint="search">
@@ -829,6 +832,50 @@
       ${disclaimer()}`;
   }
 
+  // ── 導覽地圖 ──
+  const GUIDE_STEPS = [
+    {
+      t: "開始：找到你要辦的事",
+      d: "首頁搜尋列直接打關鍵字（例：權狀不見、過戶、印鑑），或翻「情境包」找一件事牽連多個單位的完整路徑，也可以用「分類瀏覽」逛九大類。",
+      links: [{ h: "#/", l: "→ 回首頁搜尋" }, { h: "#/cat/scenario", l: "→ 看情境包" }],
+    },
+    {
+      t: "規劃：盤點文件、排進度",
+      d: "不確定自己缺什麼，用「嚮導」選目的、勾選文件有／還沒，直接生出缺件方案。看中的業務按「加入我的辦事清單」，文件備齊了在清單打勾追蹤進度，有期限的設提醒可匯出到行事曆。",
+      links: [{ h: "#/wizard", l: "→ 用嚮導盤點" }, { h: "#/my", l: "→ 我的清單" }],
+    },
+    {
+      t: "成功：出發前備妥、辦完別忘了分享",
+      d: "業務攻略頁按「⬇ 下載這頁完整包」可以列印或存 PDF 隨身帶，內容包含流程、文件清單（含你的勾選進度）與「🗣 櫃檯會問」標準答案。辦完了到「卡關案例」分享你的經驗，變成後面的人的範例。",
+      links: [{ h: "#/cases", l: "→ 卡關案例" }],
+    },
+    {
+      t: "問題回報：內容有誤或卡關了怎麼辦",
+      d: "每筆內容旁邊會標「✓ 已對照官方公告」或「△ 待查證」，待查證的出發前務必以機關最新公告為準。發現資訊錯了、卡在哪個關卡沒人講清楚，直接按「✉ 回報有誤」寄信給我們，查證後會更新內容。",
+      links: [{ h: "#/cases", l: "→ 看別人怎麼卡關" }],
+    },
+  ];
+  function renderGuide() {
+    $app.innerHTML = `
+      <header class="page-head rise">
+        <a class="backlink" href="#/">← 回首頁</a>
+        <div class="sec-h"><h2>◈ 怎麼用「跑一次就好」</h2><span class="rule"></span></div>
+        <p class="page-desc">四步驟，從找到要辦的事到辦成功，卡關也有地方問。</p>
+      </header>
+      <ol class="timeline rise rise-1">
+        ${GUIDE_STEPS.map((g, i) => `
+          <li>
+            <span class="step-no">${i + 1}</span>
+            <div class="step-t">${esc(g.t)}</div>
+            <div class="step-d">${esc(g.d)}</div>
+            <div class="step-meta">
+              ${g.links.map((lk) => `<a class="res-fix" href="${lk.h}">${esc(lk.l)}</a>`).join("")}
+            </div>
+          </li>`).join("")}
+      </ol>
+      ${disclaimer()}`;
+  }
+
   // ── Router ──
   function route() {
     const h = location.hash || "#/";
@@ -847,6 +894,7 @@
     else if (page === "cat" && arg) renderCat(arg);
     else if (page === "my") renderMy();
     else if (page === "spots") renderSpots();
+    else if (page === "guide") renderGuide();
     else renderHome();
   }
 
