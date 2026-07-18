@@ -603,8 +603,9 @@ const CASES = [
   },
 ];
 
-// ═══════════ 吉祥物 ═══════════
-const MASCOT_NAME = "辦辦貓"; // 名字待補：改這裡一處即可全站生效
+// ═══════════ 吉祥物（作者真實養的兩隻貓，各自負責不同角色） ═══════════
+const MASCOT_WHITE_NAME = "小白"; // 白貓：日常導覽／陪伴／清單——改這裡一處即可全站生效
+const MASCOT_BLACK_NAME = "小黑"; // 黑貓：判斷／抓坑／測驗——改這裡一處即可全站生效
 // 嚴肅內容迴避清單：這些頁面吉祥物不出現
 const SOLEMN_IDS = ["death"];
 const MASCOT_TIPS = [

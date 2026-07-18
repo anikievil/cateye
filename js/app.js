@@ -93,12 +93,13 @@
   const specNote = (d) => (d.spec ? `<div class="ck-spec">🗣 櫃檯會問：${esc(d.spec)}</div>` : "");
 
   // ── 吉祥物（嚴肅頁面不出現，見 SOLEMN_IDS） ──
-  function catSVG(pose = "idle", size = 64) {
+  function catSVG(pose = "idle", size = 64, variant = "white") {
+    const black = variant === "black";
     const eyes =
       pose === "happy" ? '<path d="M26 27q3-4 6 0M44 27q3-4 6 0" class="cl"/>' :
       pose === "sleep" ? '<path d="M26 28h7M43 28h7" class="cl"/>' :
       pose === "sad" ? '<path d="M26 29q3 2 6 0M44 29q3 2 6 0" class="cl"/>' :
-      '<circle cx="29" cy="27" r="2.4" class="cf"/><circle cx="47" cy="27" r="2.4" class="cf"/>';
+      '<circle cx="29" cy="27" r="2.4" class="ce"/><circle cx="47" cy="27" r="2.4" class="ce"/>';
     const mouth =
       pose === "sad" ? '<path d="M34 37q4-3 8 0" class="cl"/>' :
       pose === "happy" ? '<path d="M33 33q2.5 4 5 0q2.5 4 5 0" class="cl"/>' :
@@ -106,21 +107,24 @@
     const extra =
       pose === "sad" ? '<path d="M25 21l7 2M51 21l-7 2" class="cl"/>' :
       pose === "sleep" ? '<text x="58" y="14" class="zz">z z</text>' : "";
-    return `<svg class="cat cat-${pose}" width="${size}" height="${size}" viewBox="0 0 76 66" aria-hidden="true">
+    const whiskers = black
+      ? '<path d="M10 25h11M10 30l11-1M64 25h-11M64 30l-11-1" class="cw"/>'
+      : '<path d="M14 26h9M14 31l9-1M62 26h-9M62 31l-9-1" class="cl"/>';
+    return `<svg class="cat cat-${pose} ${black ? "cat-black" : "cat-white"}" width="${size}" height="${size}" viewBox="0 0 76 66" aria-hidden="true">
       <path class="cl cat-tail" d="M62 56q12-2 10-14" fill="none"/>
       <path class="cp" d="M20 58q-4-18 8-26l24 0q12 8 8 26z"/>
       <path class="cp" d="M22 14L26 2L36 10M54 14L50 2L40 10"/>
       <circle class="cp" cx="38" cy="26" r="17"/>
       ${eyes}<path d="M36 30l2 2 2-2" class="cl"/>${mouth}${extra}
-      <path d="M14 26h9M14 31l9-1M62 26h-9M62 31l-9-1" class="cl"/>
+      ${whiskers}
       <path class="collar" d="M27 44q11 6 22 0l1 4q-12 6-24 0z"/>
       <circle class="tag" cx="38" cy="50" r="3.4"/>
     </svg>`;
   }
-  const catBubble = (pose, text) => `
+  const catBubble = (pose, text, variant = "white") => `
     <div class="cat-row">
-      ${catSVG(pose)}
-      <div class="cat-bubble"><b>${esc(MASCOT_NAME)}</b>${esc(text)}</div>
+      ${catSVG(pose, 64, variant)}
+      <div class="cat-bubble"><b>${esc(variant === "black" ? MASCOT_BLACK_NAME : MASCOT_WHITE_NAME)}</b>${esc(text)}</div>
     </div>`;
 
   // ── 分享（原生分享面板，備援剪貼簿） ──
@@ -498,7 +502,7 @@
         ${missing.length === 0
           ? `<p class="wiz-verdict ok">🎉 ${s.docs.length} 樣全備齊——可以直接出發了！去之前再確認一次開放時間。</p>`
           : `<p class="wiz-verdict">缺 <b>${missing.length}</b> 樣，備齊 ${owned.length} 樣。${slowest ? `<br>⚠ 其中「<b>${esc(slowest.n)}</b>」要等 ${esc(slowest.wait)}——<b>今天就先去辦這個</b>，其他的等的期間再補。` : "缺的都當天可處理，照下面的順序跑就好。"}</p>`}
-        ${SOLEMN_IDS.includes(id) ? "" : catBubble(missing.length === 0 ? "happy" : "sad", missing.length === 0 ? "太強了！出發前再看一眼營業時間喵。" : "先辦最慢的那項，等待期間補其他的喵。")}
+        ${SOLEMN_IDS.includes(id) ? "" : catBubble(missing.length === 0 ? "happy" : "sad", missing.length === 0 ? "太強了！出發前再看一眼營業時間喵。" : "先辦最慢的那項，等待期間補其他的喵。", "black")}
       </article>
 
       ${missing.length ? `
@@ -547,7 +551,7 @@
 
       ${!list.length ? `
         <div class="empty-state rise">${catSVG("sleep", 80)}<br>
-          ${esc(MASCOT_NAME)}趴著等你。還沒有追蹤中的事項——<br>從<a href="#/">首頁</a>找到要辦的事，按「加入我的辦事清單」。
+          ${esc(MASCOT_WHITE_NAME)}趴著等你。還沒有追蹤中的事項——<br>從<a href="#/">首頁</a>找到要辦的事，按「加入我的辦事清單」。
         </div>` : `
         <section class="rise rise-1">
           ${list.map((id) => {
@@ -716,7 +720,7 @@
         b.disabled = true;
       });
       document.getElementById("qFeedback").innerHTML = `
-        ${item.solemn ? "" : catBubble(right ? "happy" : "sad", right ? "答對了喵！" : "中招了喵……記起來！")}
+        ${item.solemn ? "" : catBubble(right ? "happy" : "sad", right ? "答對了喵！" : "中招了喵……記起來！", "black")}
         <p class="quiz-why">${esc(item.why)}</p>
         ${byId[item.link] ? `<a class="res-fix" href="#/s/${item.link}">📖 完整攻略：${esc(byId[item.link].title)} →</a>` : ""}
         <button class="track-btn" id="qNext" style="margin-top:14px">${quiz.i + 1 < QUIZ.length ? "下一題 →" : "看我的稱號 →"}</button>`;
@@ -733,7 +737,7 @@
         <div class="sec-h"><h2>測驗結果</h2><span class="rule"></span></div>
       </header>
       <article class="doc-sheet rise" style="text-align:center">
-        ${catSVG(quiz.score >= 6 ? "happy" : quiz.score >= 3 ? "idle" : "sad", 88)}
+        ${catSVG(quiz.score >= 6 ? "happy" : quiz.score >= 3 ? "idle" : "sad", 88, "black")}
         <div class="quiz-score">${quiz.score}<small>／${QUIZ.length}</small></div>
         <div class="quiz-title">【${esc(title.t)}】</div>
         <p class="page-desc" style="margin-bottom:6px">${esc(title.d)}</p>

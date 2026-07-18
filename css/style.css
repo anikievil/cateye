@@ -431,12 +431,18 @@ html.big body { zoom: 1.18; }
 .complain-form input:focus, .complain-form textarea:focus { border-color: var(--seal); }
 
 /* ── 吉祥物 ── */
-.cat .cl { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; }
-.cat .cf { fill: var(--ink); }
-.cat .cp { fill: var(--card); stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round; }
+/* 兩隻真實的貓，毛色固定不隨深色模式變動——才認得出誰是誰 */
+.cat .cl { fill: none; stroke-width: 2.4; stroke-linecap: round; }
+.cat .cp { stroke-width: 2.4; stroke-linejoin: round; }
+.cat .ce { fill: #8c9d52; }
 .cat .collar { fill: var(--seal); }
-.cat .tag { fill: var(--gold); stroke: var(--ink); stroke-width: 1.2; }
+.cat .tag { fill: var(--gold); stroke: rgba(0,0,0,.35); stroke-width: 1.2; }
 .cat .zz { font: 700 11px var(--serif); fill: var(--ink-soft); }
+.cat-white .cl, .cat-white .cp { stroke: #6b6259; }
+.cat-white .cp { fill: #fbf8f2; }
+.cat-black .cl, .cat-black .cp { stroke: #ece1cc; }
+.cat-black .cp { fill: #201c18; }
+.cat-black .cw { fill: none; stroke: #ece1cc; stroke-width: 1.6; stroke-linecap: round; }
 .cat .cat-tail { transform-origin: 62px 56px; animation: wag 2.4s ease-in-out infinite; }
 @keyframes wag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-14deg); } }
 .cat-row { display: flex; align-items: flex-end; gap: 10px; margin: 14px 0 4px; }
