@@ -21,6 +21,14 @@
   const reminders = () => store.get("reminders", []);
   const setReminders = (v) => store.set("reminders", v);
 
+  // ── 深淺色模式（inline script 已在載入前設好初始值，這裡負責手動切換） ──
+  function applyTheme(mode) {
+    document.documentElement.dataset.theme = mode;
+    store.set("theme", mode);
+    const meta = document.getElementById("themeColorMeta");
+    if (meta) meta.content = mode === "dark" ? "#1b1714" : "#f6f1e7";
+  }
+
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   function updateBadge(n = myList().length) {
@@ -209,6 +217,7 @@
           </div>
           <div class="brand-actions">
             <a class="guide-link" href="#/guide">？怎麼用</a>
+            <button class="font-toggle" id="themeBtn">${document.documentElement.dataset.theme === "dark" ? "☀ 淺色" : "☾ 深色"}</button>
             <button class="font-toggle" id="fontBtn">${document.documentElement.classList.contains("big") ? "字－" : "字＋"}</button>
           </div>
         </div>
@@ -259,6 +268,11 @@
       const on = document.documentElement.classList.toggle("big");
       store.set("bigfont", on);
       e.target.textContent = on ? "字－" : "字＋";
+    });
+    document.getElementById("themeBtn").addEventListener("click", (e) => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      applyTheme(next);
+      e.target.textContent = next === "dark" ? "☀ 淺色" : "☾ 深色";
     });
 
     const $q = document.getElementById("q");
@@ -920,6 +934,7 @@
   window.addEventListener("hashchange", route);
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   if (store.get("bigfont", false)) document.documentElement.classList.add("big");
+  document.getElementById("themeColorMeta").content = document.documentElement.dataset.theme === "dark" ? "#1b1714" : "#f6f1e7";
   updateBadge();
   route();
 })();

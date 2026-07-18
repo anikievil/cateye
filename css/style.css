@@ -578,31 +578,30 @@ html.big body { zoom: 1.18; }
   .feat-card { flex-basis: 300px; }
 }
 
-/* ── 深色模式（跟隨系統設定） ── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #1b1714;
-    --paper-2: #241e19;
-    --card: #2b241d;
-    --ink: #ece4d6;
-    --ink-soft: #b6a992;
-    --seal: #c8402d;
-    --seal-deep: #ff8b73;
-    --stamp-green: #5fbf93;
-    --gold: #d9a53f;
-    --line: #453b32;
-    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 6px 18px -8px rgba(0,0,0,.55);
-  }
-  .tabbar { background: rgba(43,36,29,.92); }
-  .due-banner { background: rgba(200,64,45,.16); border-color: rgba(200,64,45,.45); }
-  .quiz-opt.hit { background: rgba(95,191,147,.14); }
-  .quiz-opt.miss { background: rgba(200,64,45,.16); }
-  .bingo-cell.free { color: var(--gold); }
-  .step-wait { background: rgba(217,165,63,.14); border-color: rgba(217,165,63,.4); color: var(--gold); }
-  .ck-spec { color: var(--gold); }
-  /* --seal 亮度為了按鈕白字對比降低，這幾處是拿 --seal 當純文字用，改用較亮的 --seal-deep 維持可讀性 */
-  .searchbox .s-ic, .pit-mark, .linkrow a::after, .remind-date.soon, .wiz-goal span { color: var(--seal-deep); }
+/* ── 深色模式（手動切換鈕控制，預設跟系統——見 index.html 開頭 inline script） ── */
+:root[data-theme="dark"] {
+  --paper: #1b1714;
+  --paper-2: #241e19;
+  --card: #2b241d;
+  --ink: #ece4d6;
+  --ink-soft: #b6a992;
+  --seal: #c8402d;
+  --seal-deep: #ff8b73;
+  --stamp-green: #5fbf93;
+  --gold: #d9a53f;
+  --line: #453b32;
+  --shadow: 0 1px 2px rgba(0,0,0,.35), 0 6px 18px -8px rgba(0,0,0,.55);
 }
+[data-theme="dark"] .tabbar { background: rgba(43,36,29,.92); }
+[data-theme="dark"] .due-banner { background: rgba(200,64,45,.16); border-color: rgba(200,64,45,.45); }
+[data-theme="dark"] .quiz-opt.hit { background: rgba(95,191,147,.14); }
+[data-theme="dark"] .quiz-opt.miss { background: rgba(200,64,45,.16); }
+[data-theme="dark"] .bingo-cell.free { color: var(--gold); }
+[data-theme="dark"] .step-wait { background: rgba(217,165,63,.14); border-color: rgba(217,165,63,.4); color: var(--gold); }
+[data-theme="dark"] .ck-spec { color: var(--gold); }
+/* --seal 亮度為了按鈕白字對比降低，這幾處是拿 --seal 當純文字用，改用較亮的 --seal-deep 維持可讀性 */
+[data-theme="dark"] .searchbox .s-ic, [data-theme="dark"] .pit-mark, [data-theme="dark"] .linkrow a::after,
+[data-theme="dark"] .remind-date.soon, [data-theme="dark"] .wiz-goal span { color: var(--seal-deep); }
 
 /* ── 列印／下載完整包 ── */
 @media print {
